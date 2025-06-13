@@ -1,24 +1,133 @@
-from flask import Flask, render_template, request
-import numpy as np
-import pickle
-
-app = Flask(__name__)
-model = pickle.load(open('model.pkl', 'rb'))
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    prediction = None
-    if request.method == 'POST':
-        try:
-            features = [float(request.form[feature]) for feature in [
-                'CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 
-                'DIS', 'RAD', 'TAX', 'PTRATIO', 'B', 'LSTAT']]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Boston House Price Prediction</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            margin-top: 40px;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 20px;
+        }
+        label {
+            font-weight: 600;
+            color: #555;
+            align-self: center;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 100%;
+        }
+        button {
+            grid-column: span 2;
+            padding: 12px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #007bff;
+        }
+        @media (max-width: 600px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+            button {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Boston House Price Prediction</h1>
+        <form method="POST">
+            <label for="CRIM">CRIM (Crime rate)</label>
+            <input type="number" step="any" name="CRIM" id="CRIM" required />
             
-            prediction = model.predict([features])[0]
-            prediction = round(prediction, 2)
-        except Exception as e:
-            prediction = f"Error: {e}"
-    return render_template('index.html', prediction=prediction)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+            <label for="ZN">ZN (Residential land zoned)</label>
+            <input type="number" step="any" name="ZN" id="ZN" required />
+            
+            <label for="INDUS">INDUS (Non-retail business acres)</label>
+            <input type="number" step="any" name="INDUS" id="INDUS" required />
+            
+            <label for="CHAS">CHAS (Charles River dummy variable 0 or 1)</label>
+            <input type="number" step="1" min="0" max="1" name="CHAS" id="CHAS" required />
+            
+            <label for="NOX">NOX (Nitric oxides concentration)</label>
+            <input type="number" step="any" name="NOX" id="NOX" required />
+            
+            <label for="RM">RM (Average number of rooms)</label>
+            <input type="number" step="any" name="RM" id="RM" required />
+            
+            <label for="AGE">AGE (Proportion of owner-occupied units built prior to 1940)</label>
+            <input type="number" step="any" name="AGE" id="AGE" required />
+            
+            <label for="DIS">DIS (Weighted distances to employment centers)</label>
+            <input type="number" step="any" name="DIS" id="DIS" required />
+            
+            <label for="RAD">RAD (Index of accessibility to radial highways)</label>
+            <input type="number" step="1" name="RAD" id="RAD" required />
+            
+            <label for="TAX">TAX (Full-value property-tax rate)</label>
+            <input type="number" step="any" name="TAX" id="TAX" required />
+            
+            <label for="PTRATIO">PTRATIO (Pupil-teacher ratio)</label>
+            <input type="number" step="any" name="PTRATIO" id="PTRATIO" required />
+            
+            <label for="B">B (1000(Bk - 0.63)^2 where Bk is proportion of blacks)</label>
+            <input type="number" step="any" name="B" id="B" required />
+            
+            <label for="LSTAT">LSTAT (% lower status population)</label>
+            <input type="number" step="any" name="LSTAT" id="LSTAT" required />
+            
+            <button type="submit">Predict Price</button>
+        </form>
+        {% if prediction is not none %}
+            <div class="result">
+                Predicted House Price: ${{ prediction }} (in 1000's)
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
